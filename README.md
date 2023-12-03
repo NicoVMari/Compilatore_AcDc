@@ -1,5 +1,6 @@
 # Compilatore da Ac a Dc
 
+## Linguaggio ac
 Nel linguaggio AC, sono presenti due tipi di dati principali: interi e floating point.
 
 - **Interi**: Un letterale intero è una sequenza di cifre. Se inizia con 0, non può essere seguito da altre cifre.
@@ -24,3 +25,12 @@ Le istruzioni di assegnamento e stampa seguono le seguenti sintassi:
 
 - **Assegnamento**: `variabile = espressione` oppure `variabile op= espressione`.
 - **Stampa**: `print variabile`.
+
+## Linguaggio dc
+Il linguaggio di programmazione target DC è un calcolatore "stack based," che utilizza la notazione polacca inversa (RPN), ed è cross-platform. DC è una delle prime applicazioni sviluppate per Unix.
+
+Per utilizzare DC, è sufficiente aprire il terminale e digitare `dc`, seguito da un ritorno a capo. A questo punto, è possibile inserire le espressioni da valutare. Per stampare il risultato, si digita `p` (e `q` per uscire).
+
+Gli operatori disponibili includono: `+`, `-`, `*`, `/`, e molti altri......
+
+È possibile specificare la precisione delle operazioni indicando il numero di cifre decimali da considerare. La precisione predefinita è 0, il che significa che, ad esempio, l'espressione `5 4 /` restituirà il valore 0.
