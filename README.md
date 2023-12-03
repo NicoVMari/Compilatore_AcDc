@@ -32,3 +32,7 @@ Per utilizzare DC, è sufficiente aprire il terminale e digitare `dc`, seguito d
 Gli operatori disponibili includono: `+`, `-`, `*`, `/`, e molti altri......
 
 È possibile specificare la precisione delle operazioni indicando il numero di cifre decimali da considerare. La precisione predefinita è 0, il che significa che, ad esempio, l'espressione `5 4 /` restituirà il valore 0.
+
+<p align="center">
+  <img src="https://github.com/NicoVMari/Compilatore_Ac_Dc/assets/96552280/5d3c4b84-e342-4abb-ad18-f3517dac75c8" alt="cattura" width="300" />
+</p>
