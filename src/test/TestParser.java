@@ -21,15 +21,31 @@ class TestParser {
 		Scanner scanner = new Scanner(PERCORSO+"testParserCorretto1.txt");
 		Parser parser = new Parser(scanner);
 		
-		assertDoesNotThrow(() -> parser.parse());
-	}
+		assertEquals(parser.parse().toString(),"NodeProgram [decSt=[NodePrint [id=NodeId [name=stampa]], NodeDecl [id=NodeId [name=numberfloat], type=TYFLOAT, init=null], NodeDecl [id=NodeId [name=floati], type=TYINT, init=null], NodeAssing [id=NodeId [name=a], expr=NodeBinOp [op=PLUS, left=NodeCost [value=5, type=TYINT], right=NodeCost [value=3, type=TYINT]]], NodeAssing [id=NodeId [name=b], expr=NodeBinOp [op=PLUS, left=NodeDeref [id=NodeId [name=a]], right=NodeCost [value=5, type=TYINT]]]]]");
+	} 
 	
 	@Test
 	public void testParserCorretto2() throws LexicalException, IOException, SyntacticException {
 		Scanner scanner = new Scanner(PERCORSO+"testParserCorretto2.txt");
 		Parser parser = new Parser(scanner);
 		
-		assertDoesNotThrow(() -> parser.parse()); 
+		assertEquals(parser.parse().toString(),"NodeProgram [decSt=[NodeDecl [id=NodeId [name=num], type=TYFLOAT, init=null], NodeDecl [id=NodeId [name=id], type=TYINT, init=NodeBinOp [op=DIVIDE, left=NodeCost [value=99, type=TYINT], right=NodeCost [value=2, type=TYINT]]], NodeAssing [id=NodeId [name=num], expr=NodeCost [value=5, type=TYINT]], NodeAssing [id=NodeId [name=num], expr=NodeDeref [id=NodeId [name=id]]], NodeAssing [id=NodeId [name=num], expr=NodeBinOp [op=PLUS, left=NodeDeref [id=NodeId [name=id]], right=NodeCost [value=5.0, type=TYFLOAT]]], NodeAssing [id=NodeId [name=id], expr=NodeCost [value=5, type=TYINT]], NodeAssing [id=NodeId [name=num], expr=NodeBinOp [op=TIMES, left=NodeDeref [id=NodeId [name=id]], right=NodeDeref [id=NodeId [name=id]]]], NodeAssing [id=NodeId [name=id], expr=NodeBinOp [op=MINUS, left=NodeCost [value=5, type=TYINT], right=NodeBinOp [op=DIVIDE, left=NodeBinOp [op=TIMES, left=NodeCost [value=8, type=TYINT], right=NodeCost [value=6.0, type=TYFLOAT]], right=NodeCost [value=2, type=TYINT]]]], NodeAssing [id=NodeId [name=num], expr=NodeBinOp [op=PLUS, left=NodeBinOp [op=MINUS, left=NodeBinOp [op=TIMES, left=NodeDeref [id=NodeId [name=id]], right=NodeCost [value=5, type=TYINT]], right=NodeBinOp [op=TIMES, left=NodeCost [value=8.0, type=TYFLOAT], right=NodeCost [value=6, type=TYINT]]], right=NodeCost [value=2, type=TYINT]]], NodePrint [id=NodeId [name=num]], NodePrint [id=NodeId [name=id]]]]");
+	}
+	
+	@Test
+	public void testParserAst_0() throws LexicalException, IOException, SyntacticException {
+		Scanner scanner = new Scanner(PERCORSO+"testParserAst_0.txt");
+		Parser parser = new Parser(scanner);
+		
+		assertEquals(parser.parse().toString(),"NodeProgram [decSt=[NodeDecl [id=NodeId [name=b], type=TYFLOAT, init=null], NodeDecl [id=NodeId [name=a], type=TYINT, init=null], NodeAssing [id=NodeId [name=a], expr=NodeCost [value=5, type=TYINT]], NodeAssing [id=NodeId [name=b], expr=NodeBinOp [op=PLUS, left=NodeDeref [id=NodeId [name=a]], right=NodeCost [value=3.2, type=TYFLOAT]]], NodePrint [id=NodeId [name=b]]]]");
+	}
+	
+	@Test
+	public void testParserAst_1() throws LexicalException, IOException, SyntacticException {
+		Scanner scanner = new Scanner(PERCORSO+"testParserAst_1.txt");
+		Parser parser = new Parser(scanner);
+		
+		assertEquals(parser.parse().toString(),"NodeProgram [decSt=[NodeAssing [id=NodeId [name=x], expr=NodeBinOp [op=MINUS, left=NodeBinOp [op=PLUS, left=NodeCost [value=3, type=TYINT], right=NodeBinOp [op=DIVIDE, left=NodeBinOp [op=TIMES, left=NodeCost [value=5, type=TYINT], right=NodeCost [value=7, type=TYINT]], right=NodeCost [value=8.3, type=TYFLOAT]]], right=NodeDeref [id=NodeId [name=temp]]]]]]");
 	}
 	
 	@Test
@@ -84,7 +100,7 @@ class TestParser {
 		SyntacticException ex1= assertThrows(SyntacticException.class, () -> {
 			parser.parse();
 		}); 
-		assertEquals("ERRORE: Aspettato token type 'ID' alla riga  2",ex1.getMessage());
+		assertEquals("ERRORE: Aspettato token type 'ID' alla riga  2",ex1.getMessage()); 
 	}
 	
 	@Test
