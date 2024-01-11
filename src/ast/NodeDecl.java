@@ -1,5 +1,7 @@
 package ast;
 
+import visitor.IVisitor;
+
 public class NodeDecl extends NodeDecSt{
 	private NodeId id;
 	private LangType type;
@@ -27,4 +29,8 @@ public class NodeDecl extends NodeDecSt{
 	public String toString() {
 		return "NodeDecl [id=" + id + ", type=" + type + ", init=" + init + "]";
 	}	
+	
+	public void accept(IVisitor visitor) {
+		visitor.visit(this);
+	}
 }

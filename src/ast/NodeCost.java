@@ -1,10 +1,13 @@
 package ast;
 
+import visitor.IVisitor;
+
 public class NodeCost extends NodeExpr{
 	private String value;
 	private LangType type;
 	
 	public NodeCost(String value, LangType type) {
+
 		this.value = value;
 		this.type = type;
 	}
@@ -20,5 +23,9 @@ public class NodeCost extends NodeExpr{
 	@Override
 	public String toString() {
 		return "NodeCost [value=" + value + ", type=" + type + "]";
+	}
+	
+	public void accept(IVisitor visitor) {
+		visitor.visit(this);
 	}
 }
