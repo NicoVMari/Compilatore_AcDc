@@ -7,23 +7,33 @@ import symbolTable.SymbolTable.Attributes;
 
 public class TypeCheckinVisitor implements IVisitor{
 	
+	private TypeDescriptor resType;
+	
 	public TypeCheckinVisitor() {
 		SymbolTable.init();
+	}
+	
+	public void setResType(TypeDescriptor resType) {
+		this.resType = resType;
+	}
+
+	public TypeDescriptor getResType() {
+		return resType;
 	}
 
 	@Override
 	public void visit(NodeProgram nodeProgram) {
-		TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.OK,"");
+		TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.OK);
 		
 		for(NodeDecSt nodeDecSt :  nodeProgram.getDecSt()) {
 			nodeDecSt.accept(this);
-			if(nodeDecSt.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
+			if(resType.compatibile(TypeDescriptorType.ERROR)) {
 				 tD.setTipo(TypeDescriptorType.ERROR);
-				 tD.setMsg(nodeDecSt.getTypeDescriptor().getMsg());
-			
+				 tD.setMsg(resType.getMsg());
 			}
 		}
 		
+		this.setResType(tD);
 		nodeProgram.setTypeDescriptor(tD);
 	}
 
@@ -33,13 +43,17 @@ public class TypeCheckinVisitor implements IVisitor{
 		Attributes attributes = SymbolTable.lookup(name);
 		
 		if(attributes != null) {
-			if(attributes.getTipo() == LangType.TYINT)
-				nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.INT,""));
-			else if(attributes.getTipo() == LangType.TYFLOAT)
-				nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT,"FLOAT"));
+			if(attributes.getTipo().equals(LangType.TYINT)) {
+				nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.INT));
+				this.setResType(new TypeDescriptor(TypeDescriptorType.INT));
+			}else { //if(attributes.getTipo().equals(LangType.TYFLOAT)) {
+				nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+				this.setResType(new TypeDescriptor(TypeDescriptorType.FLOAT));
+			}
 		}
 		else {
 			nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable"));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable"));
 		}	
 	}
 
@@ -48,13 +62,12 @@ public class TypeCheckinVisitor implements IVisitor{
 		LangType type = nodeCost.getType();
 	
 		if(type.equals(LangType.TYINT)) {
-			nodeCost.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.INT,""));
+			nodeCost.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.INT));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.INT));
 		}
-		else if(type.equals(LangType.TYFLOAT)){
-			nodeCost.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT,""));
-		}
-		else {
-			nodeCost.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: nodeCost"));
+		else { //if(type.equals(LangType.TYFLOAT)){
+			nodeCost.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.FLOAT));
 		}
 	}
 
@@ -64,11 +77,9 @@ public class TypeCheckinVisitor implements IVisitor{
 		
 		expr.accept(this);
 		
-		if(expr.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
-			nodeConvert.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: NodeConvert"));
-		}
-		else
-			nodeConvert.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT,""));
+		nodeConvert.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+		this.setResType(new TypeDescriptor(TypeDescriptorType.FLOAT));
+		
 	}
 
 	@Override
@@ -77,6 +88,7 @@ public class TypeCheckinVisitor implements IVisitor{
 		id.accept(this);
 		
 		nodeDeref.setTypeDescriptor(new TypeDescriptor(id.getTypeDescriptor().getTipo(),id.getTypeDescriptor().getMsg()));
+		this.setResType(new TypeDescriptor(id.getTypeDescriptor().getTipo(),id.getTypeDescriptor().getMsg()));
 	}
 
 	@Override
@@ -87,27 +99,33 @@ public class TypeCheckinVisitor implements IVisitor{
 		left.accept(this);
 		right.accept(this);
 		
-		if(left.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR) && !right.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,left.getTypeDescriptor().getMsg()));
-		}
-		else if(!left.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR) && right.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)){
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,right.getTypeDescriptor().getMsg()));
-		}
-		else if(left.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR) && right.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
+		if(left.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR) && right.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
 			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,left.getTypeDescriptor().getMsg() + "\n" + right.getTypeDescriptor().getMsg()));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR,left.getTypeDescriptor().getMsg() + "\n" + right.getTypeDescriptor().getMsg()));
 		}
-		else if(left.getTypeDescriptor().compatibile(right.getTypeDescriptor().getTipo())){
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(left.getTypeDescriptor().getTipo(),""));
+		else if(left.getTypeDescriptor().getTipo().equals(right.getTypeDescriptor().getTipo())){
+			nodeBinOp.setTypeDescriptor(new TypeDescriptor(left.getTypeDescriptor().getTipo()));
+			this.setResType(new TypeDescriptor(left.getTypeDescriptor().getTipo()));
+		}
+		else if(left.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
+			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,left.getTypeDescriptor().getMsg()));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR,left.getTypeDescriptor().getMsg()));
+		}
+		else if(right.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)){
+			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,right.getTypeDescriptor().getMsg()));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR,right.getTypeDescriptor().getMsg()));
 		}
 		else if(left.getTypeDescriptor().compatibile(TypeDescriptorType.INT) && right.getTypeDescriptor().compatibile(TypeDescriptorType.FLOAT)) {
-			NodeExpr expr = this.convertNode(left);
+			NodeConvert expr = this.convertNode(left);
 			nodeBinOp.setLeft(expr);
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT,""));
+			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.FLOAT));
 		}
 		else if(left.getTypeDescriptor().compatibile(TypeDescriptorType.FLOAT) && right.getTypeDescriptor().compatibile(TypeDescriptorType.INT)) {
-			NodeExpr expr = this.convertNode(right);
+			NodeConvert expr = this.convertNode(right);
 			nodeBinOp.setRight(expr);
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT,""));
+			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.FLOAT));
 		}
 	}
 
@@ -119,14 +137,14 @@ public class TypeCheckinVisitor implements IVisitor{
 		
 		if(SymbolTable.lookup(id.getName()) != null) {
 			nodeDecl.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: la variabile è già stata dichiarata"));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR, "ERRORE: la variabile è già stata dichiarata"));
 		}
 		else {
 			if(init != null) init.accept(this);
 			
-			if(SymbolTable.enter(id.getName(), new Attributes(type))) {
-				nodeDecl.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK,"Decl"));
-			}
-			
+			SymbolTable.enter(id.getName(), new Attributes(type));
+			nodeDecl.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.OK));
 		}
 	}
 
@@ -140,22 +158,25 @@ public class TypeCheckinVisitor implements IVisitor{
 		
 		if(nodeId.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR) && !nodeExpr.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
 			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,nodeId.getTypeDescriptor().getMsg()));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR,nodeId.getTypeDescriptor().getMsg()));
 		}
 		else if(!nodeId.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR) && nodeExpr.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)){
 			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,nodeExpr.getTypeDescriptor().getMsg()));
-		}
-		else if(nodeId.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR) && nodeExpr.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,nodeId.getTypeDescriptor().getMsg() + "\n" + nodeExpr.getTypeDescriptor().getMsg()));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR,nodeExpr.getTypeDescriptor().getMsg()));
 		}
 		else if(nodeId.getTypeDescriptor().getTipo().equals(nodeExpr.getTypeDescriptor().getTipo())) {
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK,""));
+			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.OK));
 		}
 		else if(nodeId.getTypeDescriptor().compatibile(TypeDescriptorType.INT) && nodeExpr.getTypeDescriptor().compatibile(TypeDescriptorType.FLOAT)) {
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: un float non si può usare dove r' richiesto un float"));
+			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: un float non si può usare dove e' richiesto un int"));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: un float non si può usare dove e' richiesto un int"));
 		}
 		else if(nodeId.getTypeDescriptor().compatibile(TypeDescriptorType.FLOAT) && nodeExpr.getTypeDescriptor().compatibile(TypeDescriptorType.INT)) {
-			nodeAssing.setExpr(this.convertNode(nodeExpr));
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK,""));
+			NodeConvert expr = this.convertNode(nodeExpr);
+			nodeAssing.setExpr(expr);
+			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.OK));
 		}
 	}
 
@@ -165,14 +186,17 @@ public class TypeCheckinVisitor implements IVisitor{
 		nodeId.accept(this); 
 		
 		if(nodeId.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
-			nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: NodePrint"));
-		}else 
-			nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK,"OK print"));
+			nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable"));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable"));
+		}else {
+			nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK));
+			this.setResType(new TypeDescriptor(TypeDescriptorType.OK));
+		}
 	}
 	
-	private NodeExpr convertNode(NodeExpr expr) {
+	private NodeConvert convertNode(NodeExpr expr) {
 		NodeConvert nodeConvert = new NodeConvert(expr);
-		nodeConvert.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT,""));
+		nodeConvert.accept(this);
 		return nodeConvert;
 	}
 }

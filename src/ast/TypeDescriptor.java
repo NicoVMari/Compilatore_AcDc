@@ -15,6 +15,11 @@ public class TypeDescriptor {
 		this.tipo = tipo;
 		this.msg = msg;
 	}
+	
+	public TypeDescriptor(TypeDescriptorType tipo) {
+		this.tipo = tipo;
+		this.msg = null;
+	}
 
 	public TypeDescriptorType getTipo() {
 		 return tipo;
@@ -33,8 +38,7 @@ public class TypeDescriptor {
 	}
 
 	public boolean compatibile(TypeDescriptorType tD) {
-		if(tipo == tD) return true;
-		else if(tipo == TypeDescriptorType.FLOAT && tD == TypeDescriptorType.INT) return true;
+		if(tipo == tD || tipo == TypeDescriptorType.FLOAT && tD == TypeDescriptorType.INT) return true;
 		else return false;
 	}
 }

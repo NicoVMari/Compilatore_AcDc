@@ -103,6 +103,7 @@ public class Scanner {
 	private Token scanNumber() throws IOException, LexicalException {
 		// arco 0 -> 7
 		if (this.peekChar() == '0') {
+			int flag = 0;
 			String valToken = String.valueOf(this.peekChar());
 			// arco 7 -> 11
 			this.readChar();
@@ -110,6 +111,7 @@ public class Scanner {
 			while(digits.contains(this.peekChar())) {
 				// arco ricorsivo 11 -> 11
 				valToken += String.valueOf(this.readChar());
+				flag = 1;
 			}
 			
 			if (this.peekChar() == '.') {
@@ -117,7 +119,10 @@ public class Scanner {
 				
 				// uscita arco
 				return new Token(TokenType.FLOAT, this.riga, valToken);
-			}else throw new LexicalException("NON E' POSSIBILE NON AVERE UN PUNTO DOPO CHE IL NUMERO INIZA PER 0: Provocato da '" + valToken +"' alla riga "+ this.riga);
+			}else if(flag != 1)
+				return new Token(TokenType.INT, this.riga, valToken);
+			else 
+				throw new LexicalException("NON E' POSSIBILE NON AVERE UN PUNTO DOPO CHE IL NUMERO INIZA PER 0: Provocato da '" + valToken +"' alla riga "+ this.riga);
 		}
 		// arco 0-> 2
 		else {
