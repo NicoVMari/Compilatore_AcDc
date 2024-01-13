@@ -2,3 +2,4 @@
 /visitor/
 /ast/
 /scanner/
+/symbolTable/

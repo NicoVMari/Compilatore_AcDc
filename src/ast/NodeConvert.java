@@ -12,11 +12,6 @@ public class NodeConvert extends NodeExpr{
 	public NodeExpr getExpr() {
 		return expr;
 	}
-
-	@Override
-	public String toString() {
-		return "NodeConvert [expr=" + expr + "]";
-	}
 	
 	public void accept(IVisitor visitor) {
 		visitor.visit(this);

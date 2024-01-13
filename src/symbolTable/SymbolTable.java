@@ -15,6 +15,11 @@ public class SymbolTable {
 		public LangType getTipo() {
 			return tipo;
 		}
+
+		@Override
+		public String toString() {
+			return ""+ tipo + "";
+		}
 	}
 	
 	private static HashMap<String, Attributes> table;
@@ -23,12 +28,8 @@ public class SymbolTable {
 		table = new HashMap<String,Attributes>();
 	}
 	
-	public static boolean enter(String id, Attributes entry) {
-		if(table.get(id) != null) return false;
-		else {
-			table.put(id, entry);
-			return true;
-		}
+	public static void enter(String id, Attributes entry) {
+		table.put(id, entry);
 	}
 	
 	public static Attributes lookup(String id) {
@@ -39,7 +40,7 @@ public class SymbolTable {
 		StringBuilder tableString = new StringBuilder();
 		
 		table.forEach((key, value) -> {
-			tableString.append(key + "\t" + value + "\n");
+			tableString.append(key + "\t" + value.toString() + "\n");
 		});
 		
 		return tableString.toString();

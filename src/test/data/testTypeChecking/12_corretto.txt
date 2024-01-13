@@ -1,0 +1,15 @@
+int x = 5;
+int y = 3;
+float z= 4.5;
+float h = 3.5;
+
+float c;
+
+c = z + x;
+c = z + h;
+c = x + y;
+c = x + h;
+
+c = x*y / z+h;
+
+print c;

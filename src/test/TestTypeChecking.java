@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
+import ast.LangType;
 import ast.NodeProgram;
 import ast.TypeDescriptor;
 import ast.TypeDescriptor.TypeDescriptorType;
@@ -14,6 +15,8 @@ import parser.Parser;
 import parser.SyntacticException;
 import scanner.LexicalException;
 import scanner.Scanner;
+import symbolTable.SymbolTable;
+import symbolTable.SymbolTable.Attributes;
 import visitor.TypeCheckinVisitor;
 
 class TestTypeChecking {
@@ -163,6 +166,35 @@ class TestTypeChecking {
 			nodeProgram.accept(typeCheckingVisitor);
 			
 			assertEquals(TypeDescriptorType.OK,typeCheckingVisitor.getResType().getTipo());
+		});
+	}
+	
+	@Test
+	void test12_corretto() {
+		assertDoesNotThrow(() -> {
+			NodeProgram nodeProgram =  new Parser(new Scanner(PERCORSO+"12_corretto.txt")).parse();
+			
+			var typeCheckingVisitor = new TypeCheckinVisitor();
+			nodeProgram.accept(typeCheckingVisitor);
+			
+			assertEquals(TypeDescriptorType.OK,typeCheckingVisitor.getResType().getTipo());			
+		});
+	}
+	
+	@Test
+	void test_generale() {
+		assertDoesNotThrow(() -> {
+			NodeProgram nodeProgram =  new Parser(new Scanner(PERCORSO+"generale.txt")).parse();
+			
+			var typeCheckingVisitor = new TypeCheckinVisitor();
+			nodeProgram.accept(typeCheckingVisitor);
+			
+			StringBuilder tableString = new StringBuilder("x\tTYINT\ny\tTYFLOAT\n");
+			
+			assertEquals(tableString.toString(), SymbolTable.toStr());
+			assertEquals(SymbolTable.size(),2);
+			
+			assertEquals(SymbolTable.lookup("x").getTipo(),new Attributes(LangType.TYINT).getTipo());
 		});
 	}
 }

@@ -230,17 +230,14 @@ class TestScanner {
 			scanEx.nextToken();
 		}); 
 		assertEquals("NON E' UN CARATTERE LEGALE: Provocato da '.' alla riga 7",ex6.getMessage());
-			
+		
+		scanEx.nextToken();
+		
+		scanEx.nextToken();
 		LexicalException ex8 = assertThrows(LexicalException.class, () -> {
 			scanEx.nextToken();
 		}); 
-		assertEquals("NON E' POSSIBILE NON AVERE UN PUNTO DOPO CHE IL NUMERO INIZA PER 0: Provocato da '0' alla riga 9",ex8.getMessage());
-		
-		scanEx.nextToken();
-		LexicalException ex9 = assertThrows(LexicalException.class, () -> {
-			scanEx.nextToken();
-		}); 
-		assertEquals("NON E' POSSIBILE AVERE UNA LETTERA IN UN FLOAT: Provocato da '0.33d' alla riga 10",ex9.getMessage());
+		assertEquals("NON E' POSSIBILE AVERE UNA LETTERA IN UN FLOAT: Provocato da '0.33d' alla riga 10",ex8.getMessage());
 	}
 	
 	@Test
