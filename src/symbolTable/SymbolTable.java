@@ -7,6 +7,7 @@ import ast.LangType;
 public class SymbolTable {
 	public static class Attributes {
 		private LangType tipo;
+		private char registro;
 
 		public Attributes(LangType tipo) {
 			this.tipo = tipo;

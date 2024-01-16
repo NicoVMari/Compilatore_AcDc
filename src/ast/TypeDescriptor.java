@@ -12,7 +12,7 @@ public class TypeDescriptor {
 	private String msg;
 	
 	public TypeDescriptor(TypeDescriptorType tipo, String msg) {
-		this.tipo = tipo;
+		this.tipo = tipo; 
 		this.msg = msg;
 	}
 	
