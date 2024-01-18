@@ -1,0 +1,8 @@
+float temp;
+
+temp = 1.0 / 6;
+temp = 1.5 * 2;
+temp = 5.3 + 4;
+temp = 3 - 3.5;
+
+print temp;

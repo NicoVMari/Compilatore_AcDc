@@ -6,7 +6,12 @@ import symbolTable.SymbolTable;
 import symbolTable.SymbolTable.Attributes;
 
 public class TypeCheckinVisitor implements IVisitor{
+	private TypeDescriptor resType;
 	
+	public TypeDescriptor getResType() {
+		return resType; 
+	}
+
 	public TypeCheckinVisitor() {
 		SymbolTable.init();
 	} 
@@ -20,13 +25,15 @@ public class TypeCheckinVisitor implements IVisitor{
 		if(SymbolTable.lookup(id.getName()) == null) {
 			//Analisi di tipo dell’espressione e inserire l’identificatore nella Symbol Table
 			if(init != null) init.accept(this);
+			Attributes attributes = new Attributes(type);
 			
-			SymbolTable.enter(id.getName(), new Attributes(type));
-			nodeDecl.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK));
+			SymbolTable.enter(id.getName(), attributes);
+			id.setDefinition(attributes);
+			resType = new TypeDescriptor(TypeDescriptorType.OK);
 		}
 		else 
 			//L'identificatore è gia definito
-			nodeDecl.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: la variabile è già stata dichiarata"));
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: la variabile è già stata dichiarata");
 	}
 	
 	@Override
@@ -34,9 +41,9 @@ public class TypeCheckinVisitor implements IVisitor{
 		LangType type = nodeCost.getType();
 	
 		if(type.equals(LangType.TYINT)) 
-			nodeCost.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.INT));
+			resType = new TypeDescriptor(TypeDescriptorType.INT);
 		else  //if(type.equals(LangType.TYFLOAT)){
-			nodeCost.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+			resType = new TypeDescriptor(TypeDescriptorType.FLOAT);
 	}
 
 	@Override
@@ -45,7 +52,7 @@ public class TypeCheckinVisitor implements IVisitor{
 		
 		expr.accept(this);
 		
-		nodeConvert.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+		resType = new TypeDescriptor(TypeDescriptorType.FLOAT);
 	}
 
 	@Override
@@ -53,10 +60,10 @@ public class TypeCheckinVisitor implements IVisitor{
 		NodeId id = nodeDeref.getId();
 		id.accept(this);
 		
-		if(id.getTypeDescriptor().getMsg() == null) 
-			nodeDeref.setTypeDescriptor(new TypeDescriptor(id.getTypeDescriptor().getTipo()));
+		if(resType.getMsg() == null) 
+			resType = new TypeDescriptor(resType.getTipo());
 		else 
-			nodeDeref.setTypeDescriptor(new TypeDescriptor(id.getTypeDescriptor().getTipo(),id.getTypeDescriptor().getMsg()));
+			resType = new TypeDescriptor(resType.getTipo(), resType.getMsg());
 		
 	}
 
@@ -66,34 +73,36 @@ public class TypeCheckinVisitor implements IVisitor{
 		NodeExpr right = nodeBinOp.getRight();
 		
 		left.accept(this);
+		TypeDescriptor typeDescriptorLeft = resType;
 		right.accept(this);
+		TypeDescriptor typeDescriptorRight = resType;
 		
-		if(left.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR) && right.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,left.getTypeDescriptor().getMsg() + "\n" + right.getTypeDescriptor().getMsg()));
+		if(typeDescriptorLeft.compatibile(TypeDescriptorType.ERROR) && typeDescriptorRight.compatibile(TypeDescriptorType.ERROR)) {
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,typeDescriptorLeft.getMsg() + "\n" + typeDescriptorRight.getMsg());
 			return;
 		}
-		else if(left.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,left.getTypeDescriptor().getMsg()));
+		else if(typeDescriptorLeft.compatibile(TypeDescriptorType.ERROR)) {
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,typeDescriptorLeft.getMsg());
 			return;
 		}
-		else if(right.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)){
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,right.getTypeDescriptor().getMsg()));
+		else if(typeDescriptorRight.compatibile(TypeDescriptorType.ERROR)){
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,typeDescriptorRight.getMsg());
 			return;
 		}
 		
-		if(left.getTypeDescriptor().getTipo().equals(right.getTypeDescriptor().getTipo()))
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(left.getTypeDescriptor().getTipo()));
-		else if(left.getTypeDescriptor().compatibile(TypeDescriptorType.INT) && right.getTypeDescriptor().compatibile(TypeDescriptorType.FLOAT)) {
+		if(typeDescriptorLeft.getTipo().equals(typeDescriptorRight.getTipo()))
+			resType = new TypeDescriptor(typeDescriptorLeft.getTipo());
+		else if(typeDescriptorLeft.compatibile(TypeDescriptorType.INT) && typeDescriptorRight.compatibile(TypeDescriptorType.FLOAT)) {
 			//Necessario introdurre una conversione automatica da int in float
 			NodeConvert expr = this.convertNode(left);
 			nodeBinOp.setLeft(expr);
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+			resType = new TypeDescriptor(TypeDescriptorType.FLOAT);
 		}
-		else if(left.getTypeDescriptor().compatibile(TypeDescriptorType.FLOAT) && right.getTypeDescriptor().compatibile(TypeDescriptorType.INT)) {
+		else if(typeDescriptorLeft.compatibile(TypeDescriptorType.FLOAT) && typeDescriptorRight.compatibile(TypeDescriptorType.INT)) {
 			//Necessario introdurre una conversione automatica da int in float
 			NodeConvert expr = this.convertNode(right);
 			nodeBinOp.setRight(expr);
-			nodeBinOp.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+			resType = new TypeDescriptor(TypeDescriptorType.FLOAT);
 		}
 	}
 	
@@ -102,12 +111,12 @@ public class TypeCheckinVisitor implements IVisitor{
 		NodeId nodeId = nodePrint.getId();
 		nodeId.accept(this); 
 		
-		if(nodeId.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR))
+		if(resType.compatibile(TypeDescriptorType.ERROR))
 			//La variabile non è stata dichiarata
-			nodePrint.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable"));
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable");
 		else 
 			//La variabile è stata dichiarata
-			nodePrint.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK));
+			resType = new TypeDescriptor(TypeDescriptorType.OK);
 	}
 	
 	@Override
@@ -116,30 +125,32 @@ public class TypeCheckinVisitor implements IVisitor{
 		NodeExpr nodeExpr = nodeAssing.getExpr();
 		
 		nodeId.accept(this);
-		if(nodeId.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,nodeId.getTypeDescriptor().getMsg()));
+		TypeDescriptor typeDescriptorId = resType;
+		if(typeDescriptorId.compatibile(TypeDescriptorType.ERROR)) {
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,typeDescriptorId.getMsg());
 			return;
 		}
 		
 		nodeExpr.accept(this);
-		if(nodeExpr.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)){
+		TypeDescriptor typeDescriptorExpr = resType;
+		if(typeDescriptorExpr.compatibile(TypeDescriptorType.ERROR)){
 			//Tipo non compatibile nell'espressione
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,nodeExpr.getTypeDescriptor().getMsg()));
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,typeDescriptorExpr.getMsg());
 			return;
-		}
+		} 
 		
-		if(nodeId.getTypeDescriptor().getTipo().equals(nodeExpr.getTypeDescriptor().getTipo())) 
+		if(typeDescriptorId.getTipo().equals(typeDescriptorExpr.getTipo())) 
 			//La variabile a sinistra è stata dichiarata e l’espressione a destra ha un tipo che è compatibile con quello della variabile a sinistra
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK));
-		else if(nodeId.getTypeDescriptor().compatibile(nodeExpr.getTypeDescriptor().getTipo())) {
+			resType = new TypeDescriptor(TypeDescriptorType.OK);
+		else if(typeDescriptorId.compatibile(typeDescriptorExpr.getTipo())) {
 			//La variabile a sinistra è stata dichiarata e l’espressione a destra ha un tipo che è compatibile con quello della variabile a sinistra
 			NodeConvert expr = this.convertNode(nodeExpr);
 			nodeAssing.setExpr(expr);
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.OK));
+			resType = new TypeDescriptor(TypeDescriptorType.OK);
 		}
 		else 
 			//Tipo non compatibile
-			nodeAssing.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: un float non si può usare dove e' richiesto un int"));
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: un float non si può usare dove e' richiesto un int");
 	}
 
 	@Override
@@ -149,30 +160,29 @@ public class TypeCheckinVisitor implements IVisitor{
 		
 		//Controllare che l’identificatore nel NodeId sia definito
 		if(attributes != null) {
+			nodeId.setDefinition(attributes);
 			//Se è definito, controllare il suo tipo
 			if(attributes.getTipo().equals(LangType.TYINT)) 
-				nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.INT)); 
+				resType = new TypeDescriptor(TypeDescriptorType.INT);
 			else  //if(attributes.getTipo().equals(LangType.TYFLOAT)) {
-				nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.FLOAT));
+				resType = new TypeDescriptor(TypeDescriptorType.FLOAT);
 			
 		}
 		else 
-			nodeId.setTypeDescriptor(new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable"));	
+			resType = new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable");
 	}
 	
 	@Override
-	public void visit(NodeProgram nodeProgram) {
-		TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.OK);
-		
+	public void visit(NodeProgram nodeProgram) { 
 		for(NodeDecSt nodeDecSt :  nodeProgram.getDecSt()) {
 			nodeDecSt.accept(this);
-			if(nodeDecSt.getTypeDescriptor().compatibile(TypeDescriptorType.ERROR)) {
-				 tD.setTipo(TypeDescriptorType.ERROR);
-				 tD.setMsg(nodeDecSt.getTypeDescriptor().getMsg());
+			if(resType.compatibile(TypeDescriptorType.ERROR)) {
+				resType = new TypeDescriptor(TypeDescriptorType.ERROR,resType.getMsg());
+				 return;
 			}
-		}
+		} 
 		
-		nodeProgram.setTypeDescriptor(tD);
+		resType = new TypeDescriptor(TypeDescriptorType.OK);
 	}
 	
 	private NodeConvert convertNode(NodeExpr expr) {

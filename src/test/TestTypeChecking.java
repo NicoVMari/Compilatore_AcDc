@@ -33,8 +33,8 @@ class TestTypeChecking {
 			TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.ERROR,
 					"ERRORE: la variabile è già stata dichiarata");
 
-			assertEquals(tD.getTipo(), nodeProgram.getTypeDescriptor().getTipo());
-			assertEquals(tD.getMsg(), nodeProgram.getTypeDescriptor().getMsg());
+			assertEquals(tD.getTipo(), typeCheckingVisitor.getResType().getTipo()); 
+			assertEquals(tD.getMsg(), typeCheckingVisitor.getResType().getMsg());
 		});
 	}
 
@@ -48,8 +48,8 @@ class TestTypeChecking {
 			TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.ERROR,
 					"ERRORE: Attributo non presente nella SymbolTable");
 
-			assertEquals(tD.getTipo(), nodeProgram.getTypeDescriptor().getTipo());
-			assertEquals(tD.getMsg(), nodeProgram.getTypeDescriptor().getMsg());
+			assertEquals(tD.getTipo(), typeCheckingVisitor.getResType().getTipo());
+			assertEquals(tD.getMsg(), typeCheckingVisitor.getResType().getMsg());
 		});
 	}
 
@@ -63,8 +63,8 @@ class TestTypeChecking {
 			TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.ERROR,
 					"ERRORE: Attributo non presente nella SymbolTable");
 
-			assertEquals(tD.getTipo(), nodeProgram.getTypeDescriptor().getTipo());
-			assertEquals(tD.getMsg(), nodeProgram.getTypeDescriptor().getMsg());
+			assertEquals(tD.getTipo(), typeCheckingVisitor.getResType().getTipo());
+			assertEquals(tD.getMsg(), typeCheckingVisitor.getResType().getMsg());
 		});
 	}
 
@@ -78,8 +78,8 @@ class TestTypeChecking {
 			TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.ERROR,
 					"ERRORE: un float non si può usare dove e' richiesto un int");
 
-			assertEquals(tD.getTipo(), nodeProgram.getTypeDescriptor().getTipo());
-			assertEquals(tD.getMsg(), nodeProgram.getTypeDescriptor().getMsg());
+			assertEquals(tD.getTipo(), typeCheckingVisitor.getResType().getTipo());
+			assertEquals(tD.getMsg(), typeCheckingVisitor.getResType().getMsg());
 		});
 	}
 
@@ -91,7 +91,7 @@ class TestTypeChecking {
 			var typeCheckingVisitor = new TypeCheckinVisitor();
 			nodeProgram.accept(typeCheckingVisitor);
 
-			assertEquals(TypeDescriptorType.OK, nodeProgram.getTypeDescriptor().getTipo());
+			assertEquals(TypeDescriptorType.OK, typeCheckingVisitor.getResType().getTipo());
 		});
 	}
 
@@ -103,7 +103,7 @@ class TestTypeChecking {
 			var typeCheckingVisitor = new TypeCheckinVisitor();
 			nodeProgram.accept(typeCheckingVisitor);
 
-			assertEquals(TypeDescriptorType.OK, nodeProgram.getTypeDescriptor().getTipo());
+			assertEquals(TypeDescriptorType.OK, typeCheckingVisitor.getResType().getTipo());
 		});
 	}
 
@@ -115,7 +115,7 @@ class TestTypeChecking {
 			var typeCheckingVisitor = new TypeCheckinVisitor();
 			nodeProgram.accept(typeCheckingVisitor);
 
-			assertEquals(TypeDescriptorType.OK, nodeProgram.getTypeDescriptor().getTipo());
+			assertEquals(TypeDescriptorType.OK, typeCheckingVisitor.getResType().getTipo());
 		});
 	}
 
@@ -129,8 +129,8 @@ class TestTypeChecking {
 			TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.ERROR,
 					"ERRORE: Attributo non presente nella SymbolTable");
 
-			assertEquals(tD.getTipo(), nodeProgram.getTypeDescriptor().getTipo());
-			assertEquals(tD.getMsg(), nodeProgram.getTypeDescriptor().getMsg());
+			assertEquals(tD.getTipo(), typeCheckingVisitor.getResType().getTipo());
+			assertEquals(tD.getMsg(), typeCheckingVisitor.getResType().getMsg());
 		});
 	}
 
@@ -144,8 +144,8 @@ class TestTypeChecking {
 			TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.ERROR,
 					"ERRORE: Attributo non presente nella SymbolTable");
 
-			assertEquals(tD.getTipo(), nodeProgram.getTypeDescriptor().getTipo());
-			assertEquals(tD.getMsg(), nodeProgram.getTypeDescriptor().getMsg());
+			assertEquals(tD.getTipo(), typeCheckingVisitor.getResType().getTipo());
+			assertEquals(tD.getMsg(), typeCheckingVisitor.getResType().getMsg());
 		});
 	}
 
@@ -159,8 +159,8 @@ class TestTypeChecking {
 			TypeDescriptor tD = new TypeDescriptor(TypeDescriptorType.ERROR,
 					"ERRORE: Attributo non presente nella SymbolTable\nERRORE: Attributo non presente nella SymbolTable");
 
-			assertEquals(tD.getTipo(), nodeProgram.getTypeDescriptor().getTipo());
-			assertEquals(tD.getMsg(), nodeProgram.getTypeDescriptor().getMsg());
+			assertEquals(tD.getTipo(), typeCheckingVisitor.getResType().getTipo());
+			assertEquals(tD.getMsg(), typeCheckingVisitor.getResType().getMsg());
 		});
 	}
 
@@ -172,7 +172,7 @@ class TestTypeChecking {
 			var typeCheckingVisitor = new TypeCheckinVisitor();
 			nodeProgram.accept(typeCheckingVisitor);
 
-			assertEquals(TypeDescriptorType.OK, nodeProgram.getTypeDescriptor().getTipo());
+			assertEquals(TypeDescriptorType.OK, typeCheckingVisitor.getResType().getTipo());
 		});
 	}
 
@@ -184,7 +184,7 @@ class TestTypeChecking {
 			var typeCheckingVisitor = new TypeCheckinVisitor();
 			nodeProgram.accept(typeCheckingVisitor);
 
-			assertEquals(TypeDescriptorType.OK, nodeProgram.getTypeDescriptor().getTipo());
+			assertEquals(TypeDescriptorType.OK, typeCheckingVisitor.getResType().getTipo());
 		});
 	}
 

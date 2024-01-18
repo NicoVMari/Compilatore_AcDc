@@ -16,6 +16,14 @@ public class SymbolTable {
 		public LangType getTipo() {
 			return tipo;
 		}
+		
+		public char getRegistro() {
+			return registro;
+		}
+
+		public void setRegistro(char registro) {
+			this.registro = registro;
+		}
 
 		@Override
 		public String toString() {
