@@ -196,8 +196,7 @@ class TestTypeChecking {
 			var typeCheckingVisitor = new TypeCheckinVisitor();
 			nodeProgram.accept(typeCheckingVisitor);
 
-			StringBuilder tableString = new StringBuilder("x\tTYINT\ny\tTYFLOAT\n");
-
+			StringBuilder tableString = new StringBuilder("SymbolTable:\nx\tTYINT\ny\tTYFLOAT\n");
 			assertEquals(tableString.toString(), SymbolTable.toStr());
 			assertEquals(SymbolTable.size(), 2);
 

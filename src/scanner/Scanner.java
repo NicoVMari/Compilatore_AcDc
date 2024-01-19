@@ -12,6 +12,9 @@ import java.util.Set;
 
 import token.*;
 
+/**
+ * Questa classe implementa uno scanner per il linguaggio.
+ */
 public class Scanner {
 	final char EOF = (char) -1; 
 	private int riga;
@@ -33,13 +36,26 @@ public class Scanner {
 	// keyWordsMap: mapping fra le stringhe "print", "float", "int" e il TokenType corrispondente
 	final Map<String, TokenType> keywords = new HashMap<>(Map.of("int", TokenType.TYINT, "float", TokenType.TYFLOAT, "print", TokenType.PRINT));
 
+    /**
+     * Costruttore della classe Scanner.
+     *
+     * @param fileName Il nome del file da analizzare.
+     * @throws FileNotFoundException Se il file specificato non viene trovato.
+     */
 	public Scanner(String fileName) throws FileNotFoundException {
 		// inizializzare campi che non hanno inizializzazione
 		this.buffer = new PushbackReader(new FileReader(fileName));
 		this.riga = 1;
 		this.currentToken = null; 
 	}
-
+	
+    /**
+     * Restituisce il prossimo token dal flusso di input.
+     *
+     * @return Il prossimo token.
+     * @throws LexicalException Se si verifica un errore lessicale durante la scansione.
+     * @throws IOException       Se si verifica un errore di input/output durante la scansione.
+     */
 	public Token nextToken() throws LexicalException, IOException {
 		try {
 			if (this.currentToken != null) {
@@ -100,6 +116,13 @@ public class Scanner {
 		}
 	}
 
+    /**
+     * Legge un numero dal flusso di input e restituisce il token corrispondente.
+     *
+     * @return Il token rappresentante il numero.
+     * @throws IOException       Se si verifica un errore di input/output durante la scansione.
+     * @throws LexicalException Se si verifica un errore lessicale durante la scansione.
+     */
 	private Token scanNumber() throws IOException, LexicalException {
 		// arco 0 -> 7
 		if (this.peekChar() == '0') {
@@ -150,6 +173,14 @@ public class Scanner {
 		}
 	}
 
+	  /**
+     * Legge la parte decimale di un numero float dal flusso di input.
+     *
+     * @param valToken La parte intera del numero.
+     * @return La rappresentazione completa del numero float.
+     * @throws IOException       Se si verifica un errore di input/output durante la scansione.
+     * @throws LexicalException Se si verifica un errore lessicale durante la scansione.
+     */
 	private String strTokenFloat(String valToken) throws IOException, LexicalException {
 		valToken += String.valueOf(this.readChar());
 		int cont = 0;
@@ -173,6 +204,13 @@ public class Scanner {
 		return valToken;
 	}
 
+    /**
+     * Legge un identificatore (ID) o una parola chiave dal flusso di input.
+     *
+     * @return Il token rappresentante l'ID o la parola chiave.
+     * @throws LexicalException Se si verifica un errore lessicale durante la scansione.
+     * @throws IOException       Se si verifica un errore di input/output durante la scansione.
+     */
 	private Token scanId() throws LexicalException, IOException {
 		String valToken = "";
 		while (letters.contains(this.peekChar())) {
@@ -193,16 +231,37 @@ public class Scanner {
 		}
 	}
 
+    /**
+     * Restituisce il prossimo token senza consumare il flusso di input.
+     *
+     * @return Il prossimo token.
+     * @throws LexicalException Se si verifica un errore lessicale durante la scansione.
+     * @throws IOException       Se si verifica un errore di input/output durante la scansione.
+     */
 	public Token peekToken() throws LexicalException, IOException {
 		if (this.currentToken == null)
 			return this.currentToken = this.nextToken();
 		return this.currentToken;
 	}
 
+    /**
+     * Legge un singolo carattere dal flusso di input.
+     *
+     * @return Il carattere letto.
+     * @throws IOException       Se si verifica un errore di input/output durante la scansione.
+     * @throws LexicalException Se si verifica un errore lessicale durante la scansione.
+     */
 	private char readChar() throws IOException, LexicalException {
 		return ((char) this.buffer.read());
 	}
 
+    /**
+     * Restituisce il prossimo carattere senza consumare il flusso di input.
+     *
+     * @return Il prossimo carattere nel flusso di input.
+     * @throws IOException       Se si verifica un errore di input/output durante la scansione.
+     * @throws LexicalException Se si verifica un errore lessicale durante la scansione.
+     */
 	private char peekChar() throws IOException, LexicalException {
 		char c = (char) buffer.read();
 		buffer.unread(c);

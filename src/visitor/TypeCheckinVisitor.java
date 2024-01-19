@@ -5,19 +5,36 @@ import ast.TypeDescriptor.TypeDescriptorType;
 import symbolTable.SymbolTable;
 import symbolTable.SymbolTable.Attributes;
 
+/**
+ * Questa classe rappresenta un Visitor utilizzato per eseguire il type checking
+ * su un albero AST (Abstract Syntax Tree).
+ */
 public class TypeCheckinVisitor implements IVisitor{
 	private TypeDescriptor resType;
 	
+    /**
+     * Restituisce il tipo risultante dopo il type checking.
+     *
+     * @return Il tipo risultante dopo il type checking.
+     */
 	public TypeDescriptor getResType() {
 		return resType; 
 	}
 
+    /**
+     * Costruttore della classe TypeCheckinVisitor. Inizializza la Symbol Table.
+     */
 	public TypeCheckinVisitor() {
 		SymbolTable.init();
 	} 
 	
+    /**
+     * Visita un nodo di dichiarazione (NodeDecl) e esegue il type checking.
+     *
+     * @param nodeDecl Il nodo di dichiarazione da visitare.
+     */
 	@Override
-	public void visit(NodeDecl nodeDecl) {
+	public void visit(NodeDecl nodeDecl) { 
 		NodeId id = nodeDecl.getId();
 		LangType type = nodeDecl.getType();
 		NodeExpr init = nodeDecl.getInit();
@@ -36,6 +53,11 @@ public class TypeCheckinVisitor implements IVisitor{
 			resType = new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: la variabile è già stata dichiarata");
 	}
 	
+    /**
+     * Visita un nodo costante (NodeCost) e esegue il type checking.
+     *
+     * @param nodeCost Il nodo costante da visitare.
+     */
 	@Override
 	public void visit(NodeCost nodeCost) {
 		LangType type = nodeCost.getType();
@@ -46,6 +68,11 @@ public class TypeCheckinVisitor implements IVisitor{
 			resType = new TypeDescriptor(TypeDescriptorType.FLOAT);
 	}
 
+    /**
+     * Visita un nodo di conversione (NodeConvert) e esegue il type checking.
+     *
+     * @param nodeConvert Il nodo di conversione da visitare.
+     */
 	@Override
 	public void visit(NodeConvert nodeConvert) {
 		NodeExpr expr = nodeConvert.getExpr();
@@ -55,6 +82,11 @@ public class TypeCheckinVisitor implements IVisitor{
 		resType = new TypeDescriptor(TypeDescriptorType.FLOAT);
 	}
 
+    /**
+     * Visita un nodo di dereferenziazione (NodeDeref) e esegue il type checking.
+     *
+     * @param nodeDeref Il nodo di dereferenziazione da visitare.
+     */
 	@Override
 	public void visit(NodeDeref nodeDeref) {
 		NodeId id = nodeDeref.getId();
@@ -67,6 +99,11 @@ public class TypeCheckinVisitor implements IVisitor{
 		
 	}
 
+    /**
+     * Visita un nodo di operazione binaria (NodeBinOp) e esegue il type checking.
+     *
+     * @param nodeBinOp Il nodo di operazione binaria da visitare.
+     */
 	@Override
 	public void visit(NodeBinOp nodeBinOp) {
 		NodeExpr left = nodeBinOp.getLeft();
@@ -106,6 +143,11 @@ public class TypeCheckinVisitor implements IVisitor{
 		}
 	}
 	
+    /**
+     * Visita un nodo di stampa (NodePrint) e esegue il type checking.
+     *
+     * @param nodePrint Il nodo di stampa da visitare.
+     */
 	@Override
 	public void visit(NodePrint nodePrint) {
 		NodeId nodeId = nodePrint.getId();
@@ -119,6 +161,11 @@ public class TypeCheckinVisitor implements IVisitor{
 			resType = new TypeDescriptor(TypeDescriptorType.OK);
 	}
 	
+    /**
+     * Visita un nodo di assegnamento (NodeAssing) e esegue il type checking.
+     *
+     * @param nodeAssing Il nodo di assegnamento da visitare.
+     */
 	@Override
 	public void visit(NodeAssing nodeAssing) {
 		NodeId nodeId = nodeAssing.getId();
@@ -153,6 +200,11 @@ public class TypeCheckinVisitor implements IVisitor{
 			resType = new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: un float non si può usare dove e' richiesto un int");
 	}
 
+    /**
+     * Visita un nodo di identificatore (NodeId) e esegue il type checking.
+     *
+     * @param nodeId Il nodo di identificatore da visitare.
+     */
 	@Override
 	public void visit(NodeId nodeId) {
 		String name = nodeId.getName();
@@ -172,6 +224,11 @@ public class TypeCheckinVisitor implements IVisitor{
 			resType = new TypeDescriptor(TypeDescriptorType.ERROR,"ERRORE: Attributo non presente nella SymbolTable");
 	}
 	
+    /**
+     * Visita un nodo di programma (NodeProgram) e esegue il type checking.
+     *
+     * @param nodeProgram Il nodo di programma da visitare.
+     */
 	@Override
 	public void visit(NodeProgram nodeProgram) { 
 		for(NodeDecSt nodeDecSt :  nodeProgram.getDecSt()) {
@@ -185,6 +242,13 @@ public class TypeCheckinVisitor implements IVisitor{
 		resType = new TypeDescriptor(TypeDescriptorType.OK);
 	}
 	
+    /**
+     * Converte un nodo di tipo NodeExpr in un nodo di tipo NodeConvert
+     * e restituisce il nuovo nodo convertito.
+     *
+     * @param expr Il nodo di tipo NodeExpr da convertire.
+     * @return Il nodo convertito di tipo NodeConvert.
+     */
 	private NodeConvert convertNode(NodeExpr expr) {
 		NodeConvert nodeConvert = new NodeConvert(expr);
 		nodeConvert.accept(this);
